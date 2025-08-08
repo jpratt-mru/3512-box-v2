@@ -1,0 +1,61 @@
+FROM php:8.3
+
+# Use ARGs to easily update versions and settings from the build command.
+ARG DEBIAN_FRONTEND=noninteractive
+
+# ==============================================================================
+# 1. Install System Packages & Build Dependencies
+# ==============================================================================
+# - Combine all apt-get operations into a single RUN layer to reduce image size
+#   and leverage Docker's layer caching.
+# - Use --no-install-recommends to avoid installing unnecessary packages.
+# - List packages alphabetically for better readability.
+# - Clean up apt cache at the end to keep the image lean.
+RUN apt-get update && \
+    apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends \
+    # --- Build tools & dependencies for PHP extensions ---
+    build-essential \
+    libcurl4-openssl-dev \
+    libicu-dev \
+    libonig-dev \
+    libzip-dev \
+    zlib1g-dev \
+    # --- Common tools & libraries ---
+    apt-utils \
+    curl \
+    default-mysql-client \
+    dialog \
+    git \
+    iputils-ping \
+    nano \
+    openssl \
+    wget \
+    zip \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+
+# ==============================================================================
+# 3. Install & Configure PHP Extensions
+# ==============================================================================
+# - Group all extension installations into a single RUN layer for efficiency
+#   and readability.
+RUN set -eux; \
+    pecl install xdebug; \
+    docker-php-ext-enable xdebug; \
+    docker-php-ext-install -j$(nproc) \
+    curl \
+    intl \
+    pdo_mysql \
+    zip
+
+# ==============================================================================
+# 4. Configure Apache & Create Log Dirs
+# ==============================================================================
+RUN a2enmod ssl rewrite headers && \
+    mkdir -p /etc/apache2/ssl /var/log/xdebug
+
+# ==============================================================================
+# 5. Final Cleanup
+# ==============================================================================
+RUN rm -rf /usr/src/*
