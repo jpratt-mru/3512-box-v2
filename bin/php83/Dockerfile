@@ -1,15 +1,17 @@
-FROM php:8.3-apache-bookworm
-
+FROM php:8.4-apache
 # Surpresses debconf complaints of trying to install apt packages interactively
 # https://github.com/moby/moby/issues/4032#issuecomment-192327844
 
-ARG DEBIAN_FRONTEND=noninteractive
+# ARG DEBIAN_FRONTEND=noninteractive
+
+COPY www /var/www/html
+COPY config/vhosts/default.conf /etc/apache2/sites-enabled
 
 # Update
-RUN apt-get -y update --fix-missing && \
-    apt-get upgrade -y && \
-    apt-get --no-install-recommends install -y apt-utils && \
-    rm -rf /var/lib/apt/lists/*
+# RUN apt-get -y update --fix-missing && \
+#     apt-get upgrade -y && \
+#     apt-get --no-install-recommends install -y apt-utils && \
+#     rm -rf /var/lib/apt/lists/*
 
 # I totally don't want any of the following for our 3512 purposes. It just
 # makes the Codespace spinup go that much more slowly. -JP
@@ -38,7 +40,8 @@ RUN apt-get -y update --fix-missing && \
 #     curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Install xdebug
-RUN pecl install xdebug-3.3.1 && \
+RUN docker-php-ext-install pdo_mysql && \
+    pecl install xdebug && \
     docker-php-ext-enable xdebug && \
     mkdir /var/log/xdebug
 
@@ -68,7 +71,7 @@ RUN pecl install xdebug-3.3.1 && \
 #     docker-php-ext-enable imagick
 
 # Other PHP8 Extensions. (The only one we want here is the PDO mySQL one. -JP)
-RUN docker-php-ext-install pdo_mysql
+# RUN docker-php-ext-install pdo_mysql
 # docker-php-ext-install pdo_sqlite && \
 # docker-php-ext-install bcmath && \
 # docker-php-ext-install mysqli && \
@@ -97,7 +100,7 @@ RUN docker-php-ext-install pdo_mysql
 # RUN a2enmod ssl && a2enmod rewrite
 
 # Enable apache modules
-RUN a2enmod rewrite headers
+# RUN a2enmod rewrite headers
 
 # Cleanup
-RUN rm -rf /usr/src/*
+# RUN rm -rf /usr/src/*
