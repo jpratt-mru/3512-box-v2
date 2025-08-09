@@ -100,7 +100,7 @@ RUN docker-php-ext-install pdo_mysql && \
 # RUN a2enmod ssl && a2enmod rewrite
 
 # Enable apache modules
-# RUN a2enmod rewrite headers
+RUN a2enmod rewrite headers
 
 # Cleanup
 # RUN rm -rf /usr/src/*
