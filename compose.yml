@@ -79,34 +79,49 @@ services:
           path: ./config/php/php.ini
           target: /usr/local/etc/php/php.ini
 
+    # 💬
+    # Look in the .env file for this. (It's currently /var/www/html/public.
     environment:
       APACHE_DOCUMENT_ROOT: ${APACHE_DOCUMENT_ROOT}
-    # MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
-    # MYSQL_USER: ${MYSQL_USER}
-    # MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-    # MYSQL_DATABASE: ${MYSQL_DATABASE}
-    # HOST_MACHINE_MYSQL_PORT: ${HOST_MACHINE_MYSQL_PORT}
-    # XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=${XDEBUG_PORT}"
-    # extra_hosts:
-    #   - "host.docker.internal:host-gateway"
 
     depends_on:
+      # 💬
+      # Don't spin up the webserver unless the DB is "healthy" - that is, its healthcheck
+      # runs successfully.
       database:
         condition: service_healthy
-        restart: true
 
+  ## 💬💬💬
+  # Our database resource is pretty stratightforward: a standard mariadb db.
+  # See https://hub.docker.com/_/mariadb
   database:
     image: mariadb:10.6
     container_name: 3512-box-database
     restart: always
-    # ports:
-    #   - "127.0.0.1:${HOST_MACHINE_MYSQL_PORT}:3306"
+
+    # 💬
+    # Some interestitng things going on here:
+    # - If you put a db dump sql file in the ./config/initdb folder, that db
+    #   will be created when you create the container!
+    # - You can "copy" the contents of a db by copying the contents of ./database into
+    #   another project. Useful for submissions, I reckon. (For example, if a student
+    #   has added tables to a starting database, by providing the contents of the database
+    #   folder to me, I can spin up an assignment with that database without the need for
+    #   students doing an export and me doing an import.)
     volumes:
-      # - ${MYSQL_INITDB_DIR-./config/initdb}:/docker-entrypoint-initdb.d
+      - ./config/initdb:/docker-entrypoint-initdb.d
       - ./database:/var/lib/mysql
       - ./logs/mariadb:/var/log/mysql
+
+    # 💬
+    # Look in the .env file for the password.
     environment:
       MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+
+    # 💬
+    # This is used in the depends_on sections of the webserver and adminer services
+    # to determine whether the database is good to go. There actually is a fancy script
+    # that you can run to do the
     healthcheck:
       test:
         [
@@ -124,6 +139,10 @@ services:
       retries: 5
       start_period: 30s
 
+  # 💬
+  # - This is a very lightweight (and sufficiently useful) replacement for phpMyAdmin).
+  # - See https://hub.docker.com/_/adminer
+  # - If you want to access Adminer, pop on over to http://localhost:8888
   adminer:
     image: adminer:standalone
     container_name: 3512-box-adminer
