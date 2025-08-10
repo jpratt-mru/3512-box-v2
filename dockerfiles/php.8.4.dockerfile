@@ -32,14 +32,20 @@ COPY www /var/www/html
 #   Apache detects it!
 COPY config/vhosts/default.conf /etc/apache2/sites-enabled
 
+# 💬
+# - The config refers to the config directory at the root of this project.
+# - php.ini provides useful settings XDebug and other things. (https://www.php.net/manual/en/configuration.file.php)
+COPY config/php/php.ini /usr/local/etc/php
+
 # 💬 
 # - Installs pdo_mysql so devs can use PDO in their PHP code.
 # - Installs xdebug, so that students can use VS Code's PHP Debug extenstion
 #   to do "real" debugging. If they want.
 # - We use a single RUN and the &&'s' so that all this installation 
 #   happens in one Docker layer, which apparently is a good thing. (https://docs.docker.com/build/building/best-practices/#minimize-the-number-of-layers)
+# - I locked in xdebug 3.4.5 because I confirmed that it works.
 RUN docker-php-ext-install pdo_mysql && \
-    pecl install xdebug && \
+    pecl install xdebug-3.4.5 && \
     docker-php-ext-enable xdebug && \
     mkdir /var/log/xdebug
 

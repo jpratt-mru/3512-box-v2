@@ -1,4 +1,5 @@
 .env
-data/*
+/database/*
 logs/*
 .DS_Store
+!/database/.gitkeep

@@ -1,7 +1,7 @@
 # This is going to be comment-heavy, since it's supposed to be
 # somewhat educational to read this.
 #
-# 💬
+# 💬💬💬
 # The original compose file (https://github.com/sprintcube/docker-compose-lamp/blob/master/docker-compose.yml)
 # used a lot of environment variables (which go in an .env file in the
 # same directory as the compose.yml file), which makes sense...except
@@ -9,60 +9,100 @@
 # that aren't used in this 3512 box, or which I felt obscured what
 # was actually going on, or made it harder to read this compose file.
 services:
+  ## 💬💬💬
+  # This is actually more than just a web server - it's Apache
+  # *and* PHP *and* mod_php tying the two together. Best practices
+  # these days would indicate these should be teased out into two
+  # services (a web server, PHP with php-fpm), but here we are.
   webserver:
     build:
-      # 💬
-      # I've done this context/dockerfile thing so that
-      # the
+      ## 💬💬💬
+      # I've done this context/dockerfile thing so that the COPY
+      # commands that are used there can easily refer to the
+      # www and config directories located in the root of this project.
       context: .
       dockerfile: dockerfiles/php.8.4.dockerfile
+
     container_name: 3512-box-webserver
+
     restart: always
+
     ports:
       - 80:80
       - 443:443
+
+    ## 💬💬💬
+    # The original compose file had a lot more in here, but I decided
+    # to either remove things (like ssl stuff) or shift to using watch
+    # (see the next section) and just leave the logs here.
     volumes:
-      - ${PHP_INI-./config/php/php.ini}:/usr/local/etc/php/php.ini
-      - ${SSL_DIR-./config/ssl}:/etc/apache2/ssl/
-      - ${LOG_DIR-./logs/apache2}:/var/log/apache2
-      - ${XDEBUG_LOG_DIR-./logs/xdebug}:/var/log/xdebug
+      - ./logs/apache2:/var/log/apache2
+      - ./logs/xdebug:/var/log/xdebug
+
+    # 💬💬💬
+    # This seems to be a fairly newish development in Docker Compose world.
+    # https://www.docker.com/blog/announcing-docker-compose-watch-ga-release/
+    #
+    # Instead of using volumes or bind mounts, you can use watch. So if
+    # something changes in a given host path (like www, the Apache default.conf,
+    # or PHP's php.ini), we can cause a sychronization (and restart, if
+    # a server needs to be restarted, for example) to happen.
     develop:
       watch:
+        # 💬💬💬
+        # - All student work winds up in here: static assets (images, js, and css)
+        #   and our router (rooted at index.php) goes in here; everything else
+        #   (views, controllers, etc) will go in the public subdirectory.
+        # - Since the action is sync, after a save is done on any file in here,
+        #   refreshing the page will show the result of the new files. If
+        #   you have a tool to force a browser refresh to happen when that
+        #   occurs, so much the better.
         - action: sync
           path: ./www
           target: /var/www/html
+        # 💬💬💬
+        # The default.conf file controls what Apache does with everything in
+        # html/public, so if you need to change something, we want Apache
+        # to restart (hence the sync+restart).
         - action: sync+restart
           path: ./config/vhosts/default.conf
           target: /etc/apache2/sites-enabled/default.conf
+        # 💬💬💬
+        # Kind of the same deal as with default.conf, but now with PHP
+        # settings. To be honest, the only thing useful in here for our
+        # purposes are the Xdebug settings!
+        - action: sync+restart
+          path: ./config/php/php.ini
+          target: /usr/local/etc/php/php.ini
+
     environment:
-      APACHE_DOCUMENT_ROOT: ${APACHE_DOCUMENT_ROOT-/var/www/html}
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      HOST_MACHINE_MYSQL_PORT: ${HOST_MACHINE_MYSQL_PORT}
-      XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=${XDEBUG_PORT}"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      APACHE_DOCUMENT_ROOT: ${APACHE_DOCUMENT_ROOT}
+    # MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+    # MYSQL_USER: ${MYSQL_USER}
+    # MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    # MYSQL_DATABASE: ${MYSQL_DATABASE}
+    # HOST_MACHINE_MYSQL_PORT: ${HOST_MACHINE_MYSQL_PORT}
+    # XDEBUG_CONFIG: "client_host=host.docker.internal remote_port=${XDEBUG_PORT}"
+    # extra_hosts:
+    #   - "host.docker.internal:host-gateway"
+
     depends_on:
       database:
         condition: service_healthy
         restart: true
+
   database:
     image: mariadb:10.6
     container_name: 3512-box-database
     restart: always
-    ports:
-      - "127.0.0.1:${HOST_MACHINE_MYSQL_PORT}:3306"
+    # ports:
+    #   - "127.0.0.1:${HOST_MACHINE_MYSQL_PORT}:3306"
     volumes:
-      - ${MYSQL_INITDB_DIR-./config/initdb}:/docker-entrypoint-initdb.d
-      - ${MYSQL_DATA_DIR-./data/mysql}:/var/lib/mysql
-      - ${MYSQL_LOG_DIR-./logs/mysql}:/var/log/mysql
+      # - ${MYSQL_INITDB_DIR-./config/initdb}:/docker-entrypoint-initdb.d
+      - ./database:/var/lib/mysql
+      - ./logs/mariadb:/var/log/mysql
     environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: ${MYSQL_DATABASE}
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
     healthcheck:
       test:
         [
@@ -72,13 +112,14 @@ services:
           "-h",
           "localhost",
           "-u",
-          "${MYSQL_USER}",
-          "-p${MYSQL_PASSWORD}",
+          "root",
+          "-p${MARIADB_ROOT_PASSWORD}",
         ]
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+
   adminer:
     image: adminer:standalone
     container_name: 3512-box-adminer
