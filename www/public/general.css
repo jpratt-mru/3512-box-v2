@@ -1,0 +1,642 @@
+@import url('https://fonts.googleapis.com/css?family=Raleway:400,700');
+
+/* Reset and General Styles */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Raleway', sans-serif;
+}
+
+body {
+    background: linear-gradient(90deg, #D6EFFF, #89CFF0); /* Soft blue gradient */
+    color: #333;
+    display: flex;
+    flex-direction: column; /* Stack header, content, and footer */
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Container for All Pages */
+.container {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    flex: 1; /* Allow container to grow */
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
+    overflow: auto; /* Enable scrolling if content overflows */
+}
+
+/* Home Page and Photo Dashboard Shared Layout */
+.home-page h1,
+.photos h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+    color: #007BFF; /* Blue */
+}
+
+.home-page p,
+.photos p {
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-bottom: 30px;
+    max-width: 600px;
+    color: #555;
+}
+
+.options {
+    display: flex;
+    gap: 20px; /* Spacing between buttons */
+}
+
+.button {
+    text-decoration: none;
+    padding: 15px 30px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    color: white;
+    background-color: #007BFF; /* Blue */
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.button:hover {
+    background-color: #0056B3; /* Darker Blue */
+}
+
+/* Sorting Buttons */
+.sorting {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.sorting a {
+    text-decoration: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    text-transform: uppercase;
+    color: white;
+    background-color: #007BFF;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.sorting a:hover {
+    background-color: #0056B3;
+}
+
+/* Login Page */
+.screen {
+    background: linear-gradient(90deg, #007BFF, #0056B3); /* Blue gradient */
+    position: relative;
+    height: 600px;
+    width: 360px;
+    box-shadow: 0px 0px 24px #0056B3;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.screen__content {
+    z-index: 1;
+    position: relative;
+    height: 100%;
+}
+
+.login {
+    width: 320px;
+    padding: 30px;
+    padding-top: 156px;
+    margin: 0 auto;
+}
+
+.login__field {
+    padding: 20px 0px;
+    position: relative;
+}
+
+.login__icon {
+    position: absolute;
+    top: 30px;
+    color: #89CFF0; /* Light blue icon */
+}
+
+.login__input {
+    border: none;
+    border-bottom: 2px solid #D1D1D4;
+    background: none;
+    padding: 10px;
+    padding-left: 24px;
+    font-weight: 700;
+    width: 75%;
+    transition: 0.2s;
+    color: #000; /* Black text for input */
+}
+
+.login__input:active,
+.login__input:focus,
+.login__input:hover {
+    outline: none;
+    border-bottom-color: #0056B3; /* Dark blue focus */
+}
+
+.login__submit {
+    background: #fff;
+    font-size: 14px;
+    margin-top: 30px;
+    padding: 16px 20px;
+    border-radius: 26px;
+    border: 1px solid #D4D3E8;
+    text-transform: uppercase;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    color: #0056B3; /* Dark blue text */
+    box-shadow: 0px 2px 2px #0056B3;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.login__submit:active,
+.login__submit:focus,
+.login__submit:hover {
+    border-color: #0056B3;
+    outline: none;
+}
+
+/* Button Icon */
+.button__icon {
+    font-size: 24px;
+    margin-left: auto;
+    color: #007BFF;
+}
+
+/* Table Styles (Photo Dashboard) */
+table {
+    width: 100%;
+    max-width: 1200px;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1.1rem;
+    overflow-x: auto;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+th {
+    background-color: #007BFF; /* Primary blue for table headers */
+    color: white;
+}
+
+td img {
+    width: 100px;
+    height: 100px;
+    border-radius: 5px;
+}
+
+td button {
+    margin: 0 5px;
+    padding: 5px 10px;
+    font-size: 0.9rem;
+}
+
+/* Flagged Column */
+td.flagged {
+    color: red;
+    font-weight: bold;
+}
+
+/* Stats Dashboard */
+.stats {
+    margin-top: 40px;
+}
+
+.stats-card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.stats-card p {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #555;
+}
+
+.stats-card ul {
+    margin: 10px 0 0 20px;
+    padding: 0;
+    list-style-type: disc;
+}
+
+.stats-card li {
+    margin-bottom: 5px;
+    font-size: 1rem;
+    color: #555;
+}
+
+/* Responsive Design */
+@media (max-width: 1023px) {
+    .container {
+        width: 90%;
+    }
+
+    .screen {
+        width: 90%;
+    }
+
+    table {
+        font-size: 1rem;
+    }
+
+    td img {
+        width: 80px;
+        height: 80px;
+    }
+
+    .stats-card {
+        padding: 15px;
+    }
+
+    table {
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    tr.deleted {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+}
+
+/* Footer Styles */
+footer {
+    margin-top: auto;
+    padding: 10px;
+    background-color: #007BFF; /* Primary blue */
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+    border-radius: 5px 5px 0 0;
+}
+
+footer p {
+    margin: 0;
+}
+
+/* Unique Styles for Login Page */
+.unique-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 100vh;
+    gap: 60px; /* Space between Welcome and Login sections */
+}
+
+/* Unique Welcome Text */
+.unique-welcome-message {
+    flex: 1;
+    text-align: left;
+    padding-left: 40px;
+}
+
+.unique-welcome-message .unique-text {
+    font-size: 1.5rem;
+    color: rgb(15, 10, 10);
+}
+
+.unique-welcome-message .unique-text-1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.unique-welcome-message .unique-text-2 {
+    font-size: 1.5rem;
+    font-weight: 400;
+}
+
+/* Unique Login Form Container */
+.unique-login-form-container {
+    flex: 1;
+    margin-right: 40px;
+    max-width: 400px;
+    background-color: rgba(255, 255, 255, 0.9);
+    border-radius: 10px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Unique Login Form */
+.unique-login-form .unique-title {
+    font-size: 2rem;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.unique-input-boxes {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.unique-input-box {
+    position: relative;
+}
+
+.unique-input-box input {
+    width: 100%;
+    padding: 10px;
+    padding-left: 30px;
+    font-size: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    transition: border-color 0.3s ease;
+}
+
+.unique-input-box input:focus {
+    border-color: #007BFF;
+    outline: none;
+}
+
+.unique-input-box i {
+    position: absolute;
+    top: 50%;
+    left: 10px;
+    transform: translateY(-50%);
+    color: #007BFF;
+}
+
+/* Forgot Password Link */
+.unique-text a {
+    color: #007BFF;
+    text-decoration: none;
+}
+
+.unique-text a:hover {
+    text-decoration: underline;
+}
+
+/* Submit Button */
+.unique-button input {
+    width: 100%;
+    padding: 15px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.unique-button input:hover {
+    background-color: #0056B3;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
+    .unique-container {
+        flex-direction: column;
+        padding: 20px;
+    }
+
+    .unique-welcome-message {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .unique-login-form-container {
+        width: 100%;
+        padding: 20px;
+    }
+
+    .unique-login-form .unique-title {
+        font-size: 1.8rem;
+    }
+
+    .unique-input-box input {
+        font-size: 1rem;
+    }
+    /* Add these styles to the existing CSS */
+    .sort-arrow {
+        font-size: 1.5rem; /* Make the arrow bigger */
+        font-weight: bold; /* Make the arrow bolder */
+        margin-left: 5px; /* Add some space between the text and the arrow */
+    }
+
+    .sort-arrow-up {
+        transform: rotate(180deg); /* Rotate the up arrow to make it look like the down arrow */
+    }
+        /* Styling for the search input */
+    #search-bar {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    /* Styling for search results */
+    #search-results {
+        margin-top: 10px;
+    }
+
+    /* Styling for the photos */
+    #photos-container {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    .photo-item {
+        width: 200px;
+        margin: 10px;
+        text-align: center;
+    }
+
+    .photo-item img {
+        width: 100%;
+        height: auto;
+    }
+
+    /* Styling for photo detail */
+    #photo-detail-view {
+        display: none;
+    }
+
+    #country-detail-view {
+        display: none;
+    }
+    /* Loading Spinner Styles */
+    #loading-spinner {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #007BFF;
+        margin: 20px 0;
+    }
+
+    
+    /* Styling for search result hover effect (pointer cursor) */
+    #search-results .search-result {
+        cursor: pointer;
+    }
+
+    #search-results .search-result:hover {
+        background-color: #f0f0f0; /* Light background on hover for better visibility */
+    }
+
+        /* Enhanced Loading Spinner Styles */
+    #loading-spinner {
+        text-align: center;
+        font-size: 1.5rem;
+        color: #007BFF;
+        margin: 20px 0;
+        font-weight: bold;
+    }
+
+    /* Optionally add a spinner animation */
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    #loading-spinner:after {
+        content: '⏳'; /* Hourglass or spinning icon */
+        animation: spin 2s linear infinite;
+    }
+        /* Styles for photo grid layout */
+    #photos-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Automatically adjusts the number of columns */
+        gap: 15px;
+        margin: 20px 0;
+    }
+
+    .photo-item img {
+        width: 100%; /* Ensure images take up the full width of their container */
+        border-radius: 5px;
+        object-fit: cover; /* Ensure aspect ratio is maintained */
+    }
+
+    /* For mobile responsiveness, ensure photos fit the screen */
+    @media (max-width: 768px) {
+        #photos-container {
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Smaller columns for mobile */
+        }
+    }
+
+        /* Close button styles for modal views */
+    #close-photo-detail, #close-country-detail {
+        background-color: #f44336; /* Red button to indicate close */
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    #close-photo-detail:hover, #close-country-detail:hover {
+        background-color: #d32f2f; /* Darker red on hover */
+    }
+        /* Grid View */
+    .grid-view .photo-item {
+        display: inline-block;
+        width: 30%;
+        margin: 10px;
+    }
+
+    /* List View */
+    .list-view .photo-item {
+        display: block;
+        margin-bottom: 15px;
+    }
+
+
+        /* Styling for the search input on mobile devices */
+    #search-bar {
+        width: 100%;
+        padding: 12px;
+        font-size: 1rem;
+        border: 2px solid #ccc;
+        border-radius: 5px;
+        margin-bottom: 15px;
+    }
+
+    /* Focused state for better user experience */
+    #search-bar:focus {
+        outline: none;
+        border-color: #007BFF;
+    }
+        /* Styles for matching photos view */
+    #photos-view {
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        margin-top: 20px;
+    }
+
+    #photos-view h2 {
+        font-size: 1.8rem;
+        color: #333;
+        margin-bottom: 15px;
+    }
+    /* Photos container should be styled for both grid and list */
+    #photos-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    /* Grid view (default) */
+    .grid-view {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 20px;
+    }
+
+    /* List view */
+    .list-view {
+        display: block;
+    }
+
+    .photo-item img {
+        width: 100%;
+        height: auto;
+        border-radius: 8px;
+    }
+
+    .photo-item {
+        text-align: center;
+    }
+
+    .photo-item div {
+        margin-top: 5px;
+    }
+    #photo-detail-container, #country-detail-container {
+        display: none;
+    }
+    
+
+
+
+}

@@ -1,0 +1,19 @@
+<?php
+// unflag.php
+require_once '../../database/DatabaseQueries.php';
+$db = new DatabaseQueries();
+
+// Sanitize and validate photo_id from query string
+if (isset($_GET['photo_id']) && is_numeric($_GET['photo_id'])) {
+    $photoId = (int)$_GET['photo_id']; // Cast to an integer to avoid SQL injection
+
+    // Unflag the photo
+    $db->unflagPhoto($photoId);
+    $_SESSION['message'] = 'Photo unflagged successfully.';
+} else {
+    // Invalid photo_id
+    $_SESSION['error_message'] = 'Invalid photo ID.';
+}
+
+header('Location: /admin/dashboard/photos');
+exit();
