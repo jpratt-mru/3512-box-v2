@@ -13,7 +13,7 @@
 #   - Students do not need the latest and greatest for lab and Projects.
 #   - These images were made by folks who know what they're doing and
 #     work out of the box.
-FROM php:8.4-apache
+FROM php:8.4.11-apache
 
 # 💬
 # - COPY: https://docs.docker.com/reference/dockerfile/#copy

@@ -9,11 +9,17 @@
 # that aren't used in this 3512 box, or which I felt obscured what
 # was actually going on, or made it harder to read this compose file.
 services:
-  ## 💬💬💬
+  ##################################################################################
+  #
+  # WEBSERVER SERVICE
+  #
   # This is actually more than just a web server - it's Apache
   # *and* PHP *and* mod_php tying the two together. Best practices
   # these days would indicate these should be teased out into two
   # services (a web server, PHP with php-fpm), but here we are.
+  #
+  ##################################################################################
+
   webserver:
     build:
       ## 💬💬💬
@@ -33,7 +39,9 @@ services:
 
     ports:
       - 80:80
-      - 443:443
+      # 💬
+      # Decided not to delete this, in case I change my mind about https
+      # - 443:443
 
     ## 💬💬💬
     # The original compose file had a lot more in here, but I decided
@@ -83,6 +91,7 @@ services:
     # Look in the .env file for this. (It's currently /var/www/html/public.
     environment:
       APACHE_DOCUMENT_ROOT: ${APACHE_DOCUMENT_ROOT}
+      XDEBUG_CONFIG: client_port=${XDEBUG_PORT}
 
     depends_on:
       # 💬
@@ -91,13 +100,25 @@ services:
       database:
         condition: service_healthy
 
-  ## 💬💬💬
+    networks:
+      - app-network
+
+  ##################################################################################
+  #
+  # DATABASE SERVICE
+  #
   # Our database resource is pretty stratightforward: a standard mariadb db.
   # See https://hub.docker.com/_/mariadb
+  #
+  ##################################################################################
+
   database:
-    image: mariadb:10.6
+    image: mariadb:11.8.2
     container_name: 3512-box-database
     restart: always
+
+    secrets:
+      - db_root_password
 
     # 💬
     # Some interestitng things going on here:
@@ -113,38 +134,39 @@ services:
       - ./database:/var/lib/mysql
       - ./logs/mariadb:/var/log/mysql
 
-    # 💬
-    # Look in the .env file for the password.
     environment:
-      MARIADB_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
+      MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
+      # MARIADB_DATABASE: ${MARIADB_DATABASE}
+      # MARIADB_USER: ${MARIADB_USER}
+      # MARIADB_PASSWORD: ${MARIADB_PASSWORD}
 
     # 💬
     # This is used in the depends_on sections of the webserver and adminer services
-    # to determine whether the database is good to go. There actually is a fancy script
-    # that you can run to do the
+    # to determine whether the database is good to go.
+    # See: https://mariadb.org/mariadb-server-docker-official-images-healthcheck-without-mysqladmin/
     healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u",
-          "root",
-          "-p${MARIADB_ROOT_PASSWORD}",
-        ]
-      interval: 10s
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      start_period: 1m
+      start_interval: 10s
+      interval: 1m
       timeout: 5s
-      retries: 5
-      start_period: 30s
+      retries: 3
 
-  # 💬
-  # - This is a very lightweight (and sufficiently useful) replacement for phpMyAdmin).
-  # - See https://hub.docker.com/_/adminer
-  # - If you want to access Adminer, pop on over to http://localhost:8888
+    networks:
+      - app-network
+
+  ##################################################################################
+  #
+  # ADMINER SERVICE
+  #
+  # This is a very lightweight (and sufficiently useful) replacement for phpMyAdmin.
+  # See https://hub.docker.com/_/adminer
+  # If you want to access Adminer, pop on over to http://localhost:8888
+  #
+  ##################################################################################
+
   adminer:
-    image: adminer:standalone
+    image: adminer:5.3.0-standalone
     container_name: 3512-box-adminer
     restart: always
     ports:
@@ -154,3 +176,32 @@ services:
     depends_on:
       database:
         condition: service_healthy
+    networks:
+      - app-network
+
+##################################################################################
+#
+# SECRETS
+#
+# Docker Compose allows you to store passwords as secrets.
+# See https://docs.docker.com/compose/how-tos/use-secrets/
+#
+##################################################################################
+
+secrets:
+  db_root_password:
+    file: ./secrets/db_root_password.txt
+
+##################################################################################
+#
+# NETWORK
+#
+# Provides a network for all 3 services to play on. Apparently, a good thing,
+# since on a given host, you might have other containers that need to do their
+# own thing on their own network. Isolation, isolation, isolation.
+#
+##################################################################################
+
+networks:
+  app-network:
+    driver: bridge
