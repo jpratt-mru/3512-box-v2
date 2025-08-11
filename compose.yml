@@ -43,10 +43,10 @@ services:
       # Decided not to delete this, in case I change my mind about https
       # - 443:443
 
-    ## 💬💬💬
-    # The original compose file had a lot more in here, but I decided
-    # to either remove things (like ssl stuff) or shift to using watch
-    # (see the next section) and just leave the logs here.
+      ## 💬💬💬
+      # The original compose file had a lot more in here, but I decided
+      # to either remove things (like ssl stuff) or shift to using watch
+      # (see the next section) and just leave the logs here.
     volumes:
       - ./logs/apache2:/var/log/apache2
       - ./logs/xdebug:/var/log/xdebug
@@ -136,16 +136,13 @@ services:
 
     environment:
       MARIADB_ROOT_PASSWORD_FILE: /run/secrets/db_root_password
-      # MARIADB_DATABASE: ${MARIADB_DATABASE}
-      # MARIADB_USER: ${MARIADB_USER}
-      # MARIADB_PASSWORD: ${MARIADB_PASSWORD}
 
     # 💬
     # This is used in the depends_on sections of the webserver and adminer services
     # to determine whether the database is good to go.
     # See: https://mariadb.org/mariadb-server-docker-official-images-healthcheck-without-mysqladmin/
     healthcheck:
-      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      test: [ "CMD", "healthcheck.sh", "--connect", "--innodb_initialized" ]
       start_period: 1m
       start_interval: 10s
       interval: 1m
